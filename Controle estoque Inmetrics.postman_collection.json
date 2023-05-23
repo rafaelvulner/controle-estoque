@@ -1,0 +1,276 @@
+{
+	"info": {
+		"_postman_id": "fca8c436-3dd1-41a6-a1f0-c3aae7122d83",
+		"name": "Controle estoque Inmetrics",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "Cadastrar produto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"nome\":\"Fone de ouvido\",\r\n    \"preco\": 20.99\r\n\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/cadastrarProduto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cadastrarProduto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cadastrar produtos",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"nome\": \"Ps4\",\r\n        \"preco\": 3999.00\r\n    },\r\n    {\r\n        \"nome\": \"Tv\",\r\n        \"preco\": 1555.00\r\n    },\r\n    {\r\n        \"nome\": \"Toalha\",\r\n        \"preco\": 5.99\r\n    },\r\n    {\r\n        \"nome\": \"Monitor\",\r\n        \"preco\": 299\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/cadastrarProdutos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cadastrarProdutos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar todos produtos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/buscarTodosProdutos",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buscarTodosProdutos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar produto por SKU",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/buscarProduto/ccb859a7-6af7-4898-996f-4e9466f71b08",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buscarProduto",
+								"ccb859a7-6af7-4898-996f-4e9466f71b08"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir produto",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/excluirProduto/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"excluirProduto",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Vendas",
+			"item": [
+				{
+					"name": "Venda de produto",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"produtos\": [\r\n        {\r\n            \"sku\": \"0480deec-115b-4538-aa37-32fa15ce910e\",\r\n            \"nome\": \"Tv\",\r\n            \"preco\": 1555.00\r\n        },\r\n        {\r\n            \"sku\": \"2f7f01c7-7d81-421b-9002-c42e1cd01409\",\r\n            \"nome\": \"Toalha\",\r\n            \"preco\": 5.99\r\n        },\r\n        {\r\n            \"sku\": \"3a09441e-395b-4c95-97a1-a845c0cb4c1a\",\r\n            \"nome\": \"Monitor\",\r\n            \"preco\": 299.00\r\n        }\r\n    ],\r\n    \"formaPagamento\": \"DEBITO\",\r\n    \"ativo\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/vendaDeProduto",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"vendaDeProduto"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buscar venda",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/buscarVenda/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"buscarVenda",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancelar venda",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/cancelarVenda/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"cancelarVenda",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Lançamentos",
+			"item": [
+				{
+					"name": "Consultar lançamentos diario",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/consultarLancamentosDiario",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"consultarLancamentosDiario"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "consultar lançamentos por forma de pagamento",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/consultarLancamentosPorFormaDePagamento?formaPagamento=CREDITO",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"consultarLancamentosPorFormaDePagamento"
+							],
+							"query": [
+								{
+									"key": "formaPagamento",
+									"value": "CREDITO"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Consultar lançamentos por data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8080/consultarLancamentosPorData?data=2023-05-23",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"consultarLancamentosPorData"
+							],
+							"query": [
+								{
+									"key": "data",
+									"value": "2023-05-23"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
