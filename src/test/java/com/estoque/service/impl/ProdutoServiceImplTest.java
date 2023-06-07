@@ -7,24 +7,18 @@ import com.estoque.repository.ProdutoRepository;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 class ProdutoServiceImplTest {
-
-    @MockBean
-    private ModelMapper modelMapper;
-
-    @MockBean
-    private ProdutoRepository produtoRepository;
 
     /**
      * Method under test: {@link ProdutoServiceImpl#cadastrar(List)}
