@@ -13,6 +13,8 @@ import com.estoque.service.ProdutoService;
 import com.estoque.service.VendaService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.time.LocalDate.now;
 
 @AllArgsConstructor
 @Service
@@ -39,46 +43,51 @@ public class VendaServiceImpl implements VendaService {
 
     @Override
     @Transactional
-    public VendaDTO vendaDeProdutos(VendaDTO vendaDTO) {
+    public VendaDTO cadastrar(VendaDTO vendaDTO) {
         Set<Produto> produtos = new HashSet<>();
-        Caixa caixa = Caixa.builder()
-                .dataPagamento(LocalDate.now())
-                .formaPagamento(vendaDTO.getFormaPagamento())
-                .build();
-
-        BigDecimal reduce = vendaDTO.getProdutos().stream()
+        BigDecimal total = vendaDTO.getProdutos().stream()
                 .map(ProdutoDTO::getPreco)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        caixa.setTotal(reduce);
+        Caixa caixa = Caixa.builder()
+                .dataPagamento(now())
+                .formaPagamento(vendaDTO.getFormaPagamento())
+                .total(total)
+                .build();
 
-        vendaDTO.getProdutos().forEach(p -> {
+        this.caixaRepository.save(caixa);
 
-                      produtos.add(this.produtoService.verificarProdutoPorSku(p.getSku()));
-        });
+        vendaDTO.getProdutos().forEach(p -> produtos.add(this.modelMapper.map(this.produtoService.buscarPorUUID(p.getSku()), Produto.class)));
 
         Venda venda = this.modelMapper.map(vendaDTO, Venda.class);
         venda.setProdutos(produtos);
-        venda.setDataDaVenda(LocalDate.now());
+        venda.setDataDaVenda(now());
+
+
+
         this.vendaRepository.save(venda);
 
-
-        this.caixaRepository.save(caixa);
         return vendaDTO;
     }
 
     @Override
-    public VendaDTO buscarVenda(Long id) {
+    public VendaDTO buscar(Long id) {
         return this.modelMapper.map(this.vendaRepository.findById(id), VendaDTO.class);
     }
 
     @Override
-    public List<VendaDTO> buscarTodasVendasPorData(LocalDate data) {
-        return this.vendaRepository.findByDataDaVenda(data).stream().map(p -> this.modelMapper.map(p, VendaDTO.class)).collect(Collectors.toList());
+    public List<VendaDTO> buscarTodos(LocalDate data) {
+
+        PageRequest request = PageRequest.of(1, 10, Sort.Direction.valueOf("ASC"), "ativo");
+
+        LocalDate now = now();
+        return this.vendaRepository.findByDataDaVenda((data == null ? now : data), request)
+                .stream().map(p -> modelMapper.map(p, VendaDTO.class)).collect(Collectors.toList());
+
     }
 
     @Override
-    public CancelamentoVendaDTO cancelarVenda(Long id) {
+    public CancelamentoVendaDTO cancelar(Long id) {
         Optional<Venda> venda = this.vendaRepository.findById(id);
         if (venda.isPresent()) {
             venda.get().setAtivo(false);
@@ -89,6 +98,6 @@ public class VendaServiceImpl implements VendaService {
                     .produtos(venda.get().getProdutos())
                     .build();
         }
-        throw new VendaNotFoundException("Venda N: " + venda.get().getId() + " não encontrada!");
+        throw new VendaNotFoundException("Venda N: " + id + " não encontrada!");
     }
 }

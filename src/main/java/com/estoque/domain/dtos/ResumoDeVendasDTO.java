@@ -1,5 +1,6 @@
 package com.estoque.domain.dtos;
 
+import com.estoque.domain.Caixa;
 import com.estoque.domain.FormaPagamentoEnum;
 import lombok.*;
 
@@ -13,10 +14,15 @@ import java.time.LocalDate;
 @Builder
 public class ResumoDeVendasDTO {
 
-    private LocalDate dataDaVenda;
+    private LocalDate dataPagamento;
 
     private BigDecimal total;
 
     private FormaPagamentoEnum formaPagamento;
 
+    public ResumoDeVendasDTO(Caixa caixa) {
+        this.dataPagamento = caixa.getDataPagamento();
+        this.total = caixa.getTotal();
+        this.formaPagamento = caixa.getFormaPagamento();
+    }
 }

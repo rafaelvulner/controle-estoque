@@ -1,7 +1,10 @@
 package com.estoque.domain.dtos;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -10,7 +13,6 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class ProdutoDTO {
 
     private UUID sku;
@@ -18,4 +20,9 @@ public class ProdutoDTO {
     private String nome;
 
     private BigDecimal preco;
+
+    public ProdutoDTO() {
+        if (this.sku == null)
+            this.sku = UUID.randomUUID();
+    }
 }

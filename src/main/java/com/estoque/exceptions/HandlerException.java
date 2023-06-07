@@ -9,7 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class ExceptionAdvice extends ResponseEntityExceptionHandler {
+public class HandlerException extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(VendaNotFoundException.class)
     protected ResponseEntity<?> handleVendaNotFoundException(VendaNotFoundException vendaNotFoundException, WebRequest request) {

@@ -1,9 +1,9 @@
 package com.estoque.domain;
 
 
+import jakarta.persistence.*;
 import lombok.*;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -21,6 +21,7 @@ public class Produto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "uuid")
     private UUID sku;
 
     private String nome;

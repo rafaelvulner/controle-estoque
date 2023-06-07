@@ -3,6 +3,7 @@ package com.estoque.controller;
 import com.estoque.domain.dtos.ProdutoDTO;
 import com.estoque.service.ProdutoService;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,58 +12,50 @@ import java.util.UUID;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/produto")
 public class ProdutoController {
 
     private final ProdutoService produtoService;
 
-    /**
-     * Cadastra produtos
-     * @param produtoDTO
-     * @return ProdutoDTO
-     */
-    @PostMapping("/cadastrarProduto")
-    public ResponseEntity<ProdutoDTO> cadastrarProduto(@RequestBody ProdutoDTO produtoDTO) {
-        return ResponseEntity.ok(this.produtoService.cadastrarProduto(produtoDTO));
-    }
+    private final ModelMapper modelMapper;
 
     /**
-     * Cadastra produtos
-     * @param produtoDTO
-     * @return ProdutoDTO
+     * Excluir um ou mais produtos
+     * @return
      */
-    @PostMapping("/cadastrarProdutos")
-    public ResponseEntity<List<ProdutoDTO>> cadastrarProdutos(@RequestBody List<ProdutoDTO> produtoDTOS) {
-        return ResponseEntity.ok(this.produtoService.cadastrarProdutos(produtoDTOS));
+    @PostMapping
+    public ResponseEntity<List<ProdutoDTO>> cadastrar(@RequestBody List<ProdutoDTO> produtos) {
+        return ResponseEntity.ok(this.produtoService.cadastrar(produtos));
     }
 
     /**
      * Excluir apenas pelo ID, por questões de segurança, não é possível pelo SKU
-     * @param id
      * @return Void
      */
-    @DeleteMapping("/excluirProduto/{id}")
-    public ResponseEntity<Void> excluirProduto(@PathVariable Long id) {
-        this.produtoService.excluirProduto(id);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        this.produtoService.excluir(id);
         return ResponseEntity.noContent().build();
     }
 
     /**
      * Busca produto pelo SKU
-     * @param sku
      * @return ProdutoDTO
      */
-    @GetMapping("/buscarProduto/{sku}")
-    public ResponseEntity<ProdutoDTO> buscarProduto(@PathVariable UUID sku) {
-        return ResponseEntity.ok(this.produtoService.buscarProduto(sku));
+    @GetMapping("/{sku}")
+    public ResponseEntity<ProdutoDTO> buscar(@PathVariable UUID sku) {
+        return ResponseEntity.ok(this.modelMapper.map(this.produtoService.buscarPorUUID(sku), ProdutoDTO.class));
     }
 
     /**
      * Busca todos produtos cadastrados
-     * @param
      * @return ProdutoDTO
      */
-    @GetMapping("/buscarTodosProdutos")
-    public ResponseEntity<List<ProdutoDTO>> buscarTodosProdutos() {
-        return ResponseEntity.ok(this.produtoService.buscarTodosProdutos());
+    @GetMapping
+    public ResponseEntity<List<ProdutoDTO>> buscarTodos(@RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "10") int size,
+                                                        @RequestParam(required = false, defaultValue = "ASC") String sort,
+                                                        @RequestParam(required = false, defaultValue = "nome") String order) {
+        return ResponseEntity.ok(this.produtoService.buscarTodos(page, size, sort, order));
     }
 }

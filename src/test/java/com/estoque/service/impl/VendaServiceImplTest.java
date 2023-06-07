@@ -1,16 +1,5 @@
 package com.estoque.service.impl;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.anyBoolean;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.estoque.domain.Caixa;
 import com.estoque.domain.FormaPagamentoEnum;
 import com.estoque.domain.Produto;
@@ -20,309 +9,533 @@ import com.estoque.domain.dtos.ProdutoDTO;
 import com.estoque.domain.dtos.VendaDTO;
 import com.estoque.exceptions.VendaNotFoundException;
 import com.estoque.repository.CaixaRepository;
+import com.estoque.repository.ProdutoRepository;
 import com.estoque.repository.VendaRepository;
-import com.estoque.service.ProdutoService;
-
-import java.math.BigDecimal;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.PageImpl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import org.junit.jupiter.api.Disabled;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
-import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-@ContextConfiguration(classes = {VendaServiceImpl.class})
-@ExtendWith(SpringExtension.class)
 class VendaServiceImplTest {
-    @MockBean
-    private CaixaRepository caixaRepository;
-
-    @MockBean
-    private ModelMapper modelMapper;
-
-    @MockBean
-    private ProdutoService produtoService;
-
-    @MockBean
-    private VendaRepository vendaRepository;
-
-    @Autowired
-    private VendaServiceImpl vendaServiceImpl;
 
     /**
-     * Method under test: {@link VendaServiceImpl#vendaDeProdutos(VendaDTO)}
+     * Method under test: {@link VendaServiceImpl#cadastrar(VendaDTO)}
      */
     @Test
-    void testVendaDeProdutos3() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        when(vendaRepository.save(Mockito.<Venda>any())).thenReturn(venda);
+    void testCadastrar2() {
 
-        Venda venda2 = new Venda();
-        venda2.setAtivo(true);
-        venda2.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda2.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda2.setId(1L);
-        venda2.setProdutos(new HashSet<>());
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<Object>>any())).thenReturn(venda2);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        CaixaRepository caixaRepository = mock(CaixaRepository.class);
+        when(caixaRepository.save(Mockito.any())).thenReturn(new Caixa());
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), caixaRepository);
 
-        Caixa caixa = new Caixa();
-        caixa.setDataPagamento(LocalDate.of(1970, 1, 1));
-        caixa.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        caixa.setId(1L);
-        caixa.setTotal(BigDecimal.valueOf(42L));
-        when(caixaRepository.save(Mockito.<Caixa>any())).thenReturn(caixa);
-
-        ArrayList<ProdutoDTO> produtos = new ArrayList<>();
-        produtos.add(new ProdutoDTO());
-        VendaDTO vendaDTO = mock(VendaDTO.class);
-        when(vendaDTO.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
-        when(vendaDTO.getProdutos()).thenReturn(new ArrayList<>());
-        doNothing().when(vendaDTO).setProdutos(Mockito.<List<ProdutoDTO>>any());
-        vendaDTO.setProdutos(produtos);
-        assertSame(vendaDTO, vendaServiceImpl.vendaDeProdutos(vendaDTO));
-        verify(vendaRepository).save(Mockito.<Venda>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<Object>>any());
-        verify(caixaRepository).save(Mockito.<Caixa>any());
-        verify(vendaDTO).getFormaPagamento();
-        verify(vendaDTO, atLeast(1)).getProdutos();
-        verify(vendaDTO).setProdutos(Mockito.<List<ProdutoDTO>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#vendaDeProdutos(VendaDTO)}
-     */
-    @Test
-    void testVendaDeProdutos4() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        when(vendaRepository.save(Mockito.<Venda>any())).thenReturn(venda);
-
-        Venda venda2 = new Venda();
-        venda2.setAtivo(true);
-        venda2.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda2.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda2.setId(1L);
-        venda2.setProdutos(new HashSet<>());
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<Object>>any())).thenReturn(venda2);
-        when(caixaRepository.save(Mockito.<Caixa>any())).thenThrow(new VendaNotFoundException("An error occurred"));
-
-        ArrayList<ProdutoDTO> produtos = new ArrayList<>();
-        produtos.add(new ProdutoDTO());
-        VendaDTO vendaDTO = mock(VendaDTO.class);
-        when(vendaDTO.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
-        when(vendaDTO.getProdutos()).thenReturn(new ArrayList<>());
-        doNothing().when(vendaDTO).setProdutos(Mockito.<List<ProdutoDTO>>any());
-        vendaDTO.setProdutos(produtos);
-        assertThrows(VendaNotFoundException.class, () -> vendaServiceImpl.vendaDeProdutos(vendaDTO));
-        verify(vendaRepository).save(Mockito.<Venda>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<Object>>any());
-        verify(caixaRepository).save(Mockito.<Caixa>any());
-        verify(vendaDTO).getFormaPagamento();
-        verify(vendaDTO, atLeast(1)).getProdutos();
-        verify(vendaDTO).setProdutos(Mockito.<List<ProdutoDTO>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#buscarVenda(Long)}
-     */
-    @Test
-    void testBuscarVenda() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        Optional<Venda> ofResult = Optional.of(venda);
-        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<Object>>any()))
-                .thenThrow(new VendaNotFoundException("An error occurred"));
-        assertThrows(VendaNotFoundException.class, () -> vendaServiceImpl.buscarVenda(1L));
-        verify(vendaRepository).findById(Mockito.<Long>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<Object>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#buscarVenda(Long)}
-     */
-    @Test
-    void testBuscarVenda2() {
-        Venda venda = mock(Venda.class);
-        doNothing().when(venda).setAtivo(anyBoolean());
-        doNothing().when(venda).setDataDaVenda(Mockito.<LocalDate>any());
-        doNothing().when(venda).setFormaPagamento(Mockito.<FormaPagamentoEnum>any());
-        doNothing().when(venda).setId(Mockito.<Long>any());
-        doNothing().when(venda).setProdutos(Mockito.<Set<Produto>>any());
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        Optional<Venda> ofResult = Optional.of(venda);
-        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
         VendaDTO vendaDTO = new VendaDTO();
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<Object>>any())).thenReturn(vendaDTO);
-        assertSame(vendaDTO, vendaServiceImpl.buscarVenda(1L));
+        vendaDTO.setProdutos(new ArrayList<>());
+        assertSame(vendaDTO, vendaServiceImpl.cadastrar(vendaDTO));
+        verify(vendaRepository).save(Mockito.any());
+        verify(caixaRepository).save(Mockito.any());
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#cadastrar(VendaDTO)}
+     */
+    @Test
+    void testCadastrar3() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        CaixaRepository caixaRepository = mock(CaixaRepository.class);
+        when(caixaRepository.save(Mockito.any())).thenThrow(new VendaNotFoundException("An error occurred"));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), caixaRepository);
+
+        VendaDTO vendaDTO = new VendaDTO();
+        vendaDTO.setProdutos(new ArrayList<>());
+        assertThrows(VendaNotFoundException.class, () -> vendaServiceImpl.cadastrar(vendaDTO));
+        verify(caixaRepository).save(Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#cadastrar(VendaDTO)}
+     */
+    @Test
+    void testCadastrar5() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        ModelMapper modelMapper = mock(ModelMapper.class);
+        when(modelMapper.map(Mockito.any(), Mockito.<Class<Venda>>any())).thenReturn(new Venda());
+        CaixaRepository caixaRepository = mock(CaixaRepository.class);
+        when(caixaRepository.save(Mockito.any())).thenReturn(new Caixa());
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), caixaRepository);
+
+        VendaDTO vendaDTO = new VendaDTO();
+        vendaDTO.setProdutos(new ArrayList<>());
+        assertSame(vendaDTO, vendaServiceImpl.cadastrar(vendaDTO));
+        verify(vendaRepository).save(Mockito.any());
+        verify(modelMapper).map(Mockito.any(), Mockito.<Class<Venda>>any());
+        verify(caixaRepository).save(Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscar(Long)}
+     */
+    @Test
+    void testBuscar() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(new Venda()));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaDTO actualBuscarResult = (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscar(1L);
+        assertNull(actualBuscarResult.getDataDaVenda());
+        assertFalse(actualBuscarResult.isAtivo());
+        assertNull(actualBuscarResult.getProdutos());
+        assertNull(actualBuscarResult.getFormaPagamento());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscar(Long)}
+     */
+    @Test
+    void testBuscar2() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        HashSet<Produto> produtos = new HashSet<>();
+        when(vendaRepository.findById(Mockito.<Long>any()))
+                .thenReturn(Optional.of(new Venda(1L, FormaPagamentoEnum.DEBITO, produtos, LocalDate.of(1970, 1, 1), true)));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaDTO actualBuscarResult = (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscar(1L);
+        assertEquals("1970-01-01", actualBuscarResult.getDataDaVenda().toString());
+        assertTrue(actualBuscarResult.isAtivo());
+        assertTrue(actualBuscarResult.getProdutos().isEmpty());
+        assertEquals(FormaPagamentoEnum.DEBITO, actualBuscarResult.getFormaPagamento());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscar(Long)}
+     */
+    @Test
+    void testBuscar3() {
+
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(new HashSet<>());
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(venda));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaDTO actualBuscarResult = (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscar(1L);
+        assertEquals("1970-01-01", actualBuscarResult.getDataDaVenda().toString());
+        assertTrue(actualBuscarResult.isAtivo());
+        assertTrue(actualBuscarResult.getProdutos().isEmpty());
+        assertEquals(FormaPagamentoEnum.DEBITO, actualBuscarResult.getFormaPagamento());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+        verify(venda).isAtivo();
+        verify(venda).getFormaPagamento();
+        verify(venda).getDataDaVenda();
+        verify(venda).getProdutos();
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscar(Long)}
+     */
+    @Test
+    void testBuscar4() {
+
+        HashSet<Produto> produtoSet = new HashSet<>();
+        produtoSet.add(new Produto());
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(produtoSet);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(venda));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaDTO actualBuscarResult = (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscar(1L);
+        assertEquals("1970-01-01", actualBuscarResult.getDataDaVenda().toString());
+        assertTrue(actualBuscarResult.isAtivo());
+        List<ProdutoDTO> produtos = actualBuscarResult.getProdutos();
+        assertEquals(1, produtos.size());
+        assertEquals(FormaPagamentoEnum.DEBITO, actualBuscarResult.getFormaPagamento());
+        ProdutoDTO getResult = produtos.get(0);
+        assertNull(getResult.getNome());
+        assertNull(getResult.getSku());
+        assertNull(getResult.getPreco());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+        verify(venda).isAtivo();
+        verify(venda).getFormaPagamento();
+        verify(venda).getDataDaVenda();
+        verify(venda).getProdutos();
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscar(Long)}
+     */
+    @Test
+    void testBuscar6() {
+
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(new HashSet<>());
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(venda));
+        ModelMapper modelMapper = mock(ModelMapper.class);
+        VendaDTO vendaDTO = new VendaDTO();
+        when(modelMapper.map(Mockito.any(), Mockito.any())).thenReturn(vendaDTO);
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        assertSame(vendaDTO, (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscar(1L));
+        verify(vendaRepository).findById(Mockito.<Long>any());
+        verify(modelMapper).map(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        assertTrue(vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1)).isEmpty());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos2() {
+
+        ArrayList<Venda> content = new ArrayList<>();
+        content.add(new Venda());
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        List<VendaDTO> actualBuscarTodosResult = vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1));
+        assertEquals(1, actualBuscarTodosResult.size());
+        VendaDTO getResult = actualBuscarTodosResult.get(0);
+        assertNull(getResult.getDataDaVenda());
+        assertFalse(getResult.isAtivo());
+        assertNull(getResult.getProdutos());
+        assertNull(getResult.getFormaPagamento());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos3() {
+
+        ArrayList<Venda> content = new ArrayList<>();
+        content.add(new Venda());
+        content.add(new Venda());
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        List<VendaDTO> actualBuscarTodosResult = vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1));
+        assertEquals(2, actualBuscarTodosResult.size());
+        VendaDTO getResult = actualBuscarTodosResult.get(0);
+        assertFalse(getResult.isAtivo());
+        VendaDTO getResult2 = actualBuscarTodosResult.get(1);
+        assertFalse(getResult2.isAtivo());
+        assertNull(getResult2.getProdutos());
+        assertNull(getResult2.getFormaPagamento());
+        assertNull(getResult2.getDataDaVenda());
+        assertNull(getResult.getProdutos());
+        assertNull(getResult.getFormaPagamento());
+        assertNull(getResult.getDataDaVenda());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos5() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(new ArrayList<>()));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        assertTrue((new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).buscarTodos(null)
+                .isEmpty());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos6() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenThrow(new VendaNotFoundException("An error occurred"));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        assertThrows(VendaNotFoundException.class, () -> vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1)));
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos8() {
+
+        ArrayList<Venda> content = new ArrayList<>();
+        HashSet<Produto> produtos = new HashSet<>();
+        content.add(new Venda(1L, FormaPagamentoEnum.DEBITO, produtos, LocalDate.of(1970, 1, 1), true));
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        List<VendaDTO> actualBuscarTodosResult = vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1));
+        assertEquals(1, actualBuscarTodosResult.size());
+        VendaDTO getResult = actualBuscarTodosResult.get(0);
+        assertEquals("1970-01-01", getResult.getDataDaVenda().toString());
+        assertTrue(getResult.isAtivo());
+        assertTrue(getResult.getProdutos().isEmpty());
+        assertEquals(FormaPagamentoEnum.DEBITO, getResult.getFormaPagamento());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos9() {
+
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(new HashSet<>());
+
+        ArrayList<Venda> content = new ArrayList<>();
+        content.add(venda);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        List<VendaDTO> actualBuscarTodosResult = vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1));
+        assertEquals(1, actualBuscarTodosResult.size());
+        VendaDTO getResult = actualBuscarTodosResult.get(0);
+        assertEquals("1970-01-01", getResult.getDataDaVenda().toString());
+        assertTrue(getResult.isAtivo());
+        assertTrue(getResult.getProdutos().isEmpty());
+        assertEquals(FormaPagamentoEnum.DEBITO, getResult.getFormaPagamento());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        verify(venda).isAtivo();
+        verify(venda).getFormaPagamento();
+        verify(venda).getDataDaVenda();
+        verify(venda).getProdutos();
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos10() {
+
+        HashSet<Produto> produtoSet = new HashSet<>();
+        produtoSet.add(new Produto());
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(produtoSet);
+
+        ArrayList<Venda> content = new ArrayList<>();
+        content.add(venda);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        List<VendaDTO> actualBuscarTodosResult = vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1));
+        assertEquals(1, actualBuscarTodosResult.size());
+        VendaDTO getResult = actualBuscarTodosResult.get(0);
+        assertEquals("1970-01-01", getResult.getDataDaVenda().toString());
+        assertTrue(getResult.isAtivo());
+        List<ProdutoDTO> produtos = getResult.getProdutos();
+        assertEquals(1, produtos.size());
+        assertEquals(FormaPagamentoEnum.DEBITO, getResult.getFormaPagamento());
+        ProdutoDTO getResult2 = produtos.get(0);
+        assertNull(getResult2.getNome());
+        assertNull(getResult2.getSku());
+        assertNull(getResult2.getPreco());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        verify(venda).isAtivo();
+        verify(venda).getFormaPagamento();
+        verify(venda).getDataDaVenda();
+        verify(venda).getProdutos();
+        assertNull(vendaServiceImpl.buscar(1L));
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#buscarTodos(LocalDate)}
+     */
+    @Test
+    void testBuscarTodos11() {
+
+        Venda venda = mock(Venda.class);
+        when(venda.isAtivo()).thenReturn(true);
+        when(venda.getFormaPagamento()).thenReturn(FormaPagamentoEnum.DEBITO);
+        when(venda.getDataDaVenda()).thenReturn(LocalDate.of(1970, 1, 1));
+        when(venda.getProdutos()).thenReturn(new HashSet<>());
+
+        ArrayList<Venda> content = new ArrayList<>();
+        content.add(venda);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.findByDataDaVenda(Mockito.any(), Mockito.any()))
+                .thenReturn(new PageImpl<>(content));
+        ModelMapper modelMapper = mock(ModelMapper.class);
+        when(modelMapper.map(Mockito.any(), Mockito.any())).thenReturn(null);
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        VendaServiceImpl vendaServiceImpl = new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class));
+        assertEquals(1, vendaServiceImpl.buscarTodos(LocalDate.of(1970, 1, 1)).size());
+        verify(vendaRepository).findByDataDaVenda(Mockito.any(), Mockito.any());
+        verify(modelMapper).map(Mockito.any(), Mockito.any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#cancelar(Long)}
+     */
+    @Test
+    void testCancelar() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(new Venda()));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        CancelamentoVendaDTO actualCancelarResult = (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).cancelar(1L);
+        assertNull(actualCancelarResult.getFormaPagamento());
+        assertNull(actualCancelarResult.getProdutos());
+        assertEquals("Venda N: null cancelado!", actualCancelarResult.getMensagem());
+        verify(vendaRepository).save(Mockito.any());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#cancelar(Long)}
+     */
+    @Test
+    void testCancelar2() {
+
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenThrow(new VendaNotFoundException("An error occurred"));
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.of(new Venda()));
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        assertThrows(VendaNotFoundException.class, () -> (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).cancelar(1L));
+        verify(vendaRepository).save(Mockito.any());
+        verify(vendaRepository).findById(Mockito.<Long>any());
+    }
+
+    /**
+     * Method under test: {@link VendaServiceImpl#cancelar(Long)}
+     */
+    @Test
+    void testCancelar3() {
+
+        Venda venda = mock(Venda.class);
+        when(venda.getFormaPagamento()).thenThrow(new VendaNotFoundException("An error occurred"));
+        when(venda.getId()).thenThrow(new VendaNotFoundException("An error occurred"));
+        when(venda.getProdutos()).thenThrow(new VendaNotFoundException("An error occurred"));
+        doThrow(new VendaNotFoundException("An error occurred")).when(venda).setAtivo(anyBoolean());
+        Optional<Venda> ofResult = Optional.of(venda);
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        assertThrows(VendaNotFoundException.class, () -> (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).cancelar(1L));
         verify(vendaRepository).findById(Mockito.<Long>any());
         verify(venda).setAtivo(anyBoolean());
-        verify(venda).setDataDaVenda(Mockito.<LocalDate>any());
-        verify(venda).setFormaPagamento(Mockito.<FormaPagamentoEnum>any());
-        verify(venda).setId(Mockito.<Long>any());
-        verify(venda).setProdutos(Mockito.<Set<Produto>>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<Object>>any());
     }
 
     /**
-     * Method under test: {@link VendaServiceImpl#buscarTodasVendasPorData(LocalDate)}
+     * Method under test: {@link VendaServiceImpl#cancelar(Long)}
      */
     @Test
-    void testBuscarTodasVendasPorData() {
-        when(vendaRepository.findByDataDaVenda(Mockito.<LocalDate>any())).thenReturn(new ArrayList<>());
-        assertTrue(vendaServiceImpl.buscarTodasVendasPorData(LocalDate.of(1970, 1, 1)).isEmpty());
-        verify(vendaRepository).findByDataDaVenda(Mockito.<LocalDate>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#buscarTodasVendasPorData(LocalDate)}
-     */
-    @Test
-    void testBuscarTodasVendasPorData2() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-
-        ArrayList<Venda> vendaList = new ArrayList<>();
-        vendaList.add(venda);
-        when(vendaRepository.findByDataDaVenda(Mockito.<LocalDate>any())).thenReturn(vendaList);
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any())).thenReturn(new VendaDTO());
-        assertEquals(1, vendaServiceImpl.buscarTodasVendasPorData(LocalDate.of(1970, 1, 1)).size());
-        verify(vendaRepository).findByDataDaVenda(Mockito.<LocalDate>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#buscarTodasVendasPorData(LocalDate)}
-     */
-    @Test
-    void testBuscarTodasVendasPorData3() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-
-        Venda venda2 = new Venda();
-        venda2.setAtivo(false);
-        venda2.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda2.setFormaPagamento(FormaPagamentoEnum.CREDITO);
-        venda2.setId(2L);
-        venda2.setProdutos(new HashSet<>());
-
-        ArrayList<Venda> vendaList = new ArrayList<>();
-        vendaList.add(venda2);
-        vendaList.add(venda);
-        when(vendaRepository.findByDataDaVenda(Mockito.<LocalDate>any())).thenReturn(vendaList);
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any())).thenReturn(new VendaDTO());
-        assertEquals(2, vendaServiceImpl.buscarTodasVendasPorData(LocalDate.of(1970, 1, 1)).size());
-        verify(vendaRepository).findByDataDaVenda(Mockito.<LocalDate>any());
-        verify(modelMapper, atLeast(1)).map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#buscarTodasVendasPorData(LocalDate)}
-     */
-    @Test
-    void testBuscarTodasVendasPorData4() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-
-        ArrayList<Venda> vendaList = new ArrayList<>();
-        vendaList.add(venda);
-        when(vendaRepository.findByDataDaVenda(Mockito.<LocalDate>any())).thenReturn(vendaList);
-        when(modelMapper.map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any()))
-                .thenThrow(new VendaNotFoundException("An error occurred"));
-        assertThrows(VendaNotFoundException.class,
-                () -> vendaServiceImpl.buscarTodasVendasPorData(LocalDate.of(1970, 1, 1)));
-        verify(vendaRepository).findByDataDaVenda(Mockito.<LocalDate>any());
-        verify(modelMapper).map(Mockito.<Object>any(), Mockito.<Class<VendaDTO>>any());
-    }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#cancelarVenda(Long)}
-     */
-    @Test
-    void testCancelarVenda() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        Optional<Venda> ofResult = Optional.of(venda);
-
-        Venda venda2 = new Venda();
-        venda2.setAtivo(true);
-        venda2.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda2.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda2.setId(1L);
-        venda2.setProdutos(new HashSet<>());
-        when(vendaRepository.save(Mockito.<Venda>any())).thenReturn(venda2);
-        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-        CancelamentoVendaDTO actualCancelarVendaResult = vendaServiceImpl.cancelarVenda(1L);
-        assertEquals(FormaPagamentoEnum.DEBITO, actualCancelarVendaResult.getFormaPagamento());
-        assertTrue(actualCancelarVendaResult.getProdutos().isEmpty());
-        assertEquals("Venda N: 1 cancelado!", actualCancelarVendaResult.getMensagem());
-        verify(vendaRepository).save(Mockito.<Venda>any());
+    void testCancelar4() {
+        VendaRepository vendaRepository = mock(VendaRepository.class);
+        when(vendaRepository.save(Mockito.any())).thenReturn(new Venda());
+        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(Optional.empty());
+        ModelMapper modelMapper = new ModelMapper();
+        ProdutoRepository produtoRepository = mock(ProdutoRepository.class);
+        assertThrows(VendaNotFoundException.class, () -> (new VendaServiceImpl(vendaRepository, modelMapper,
+                new ProdutoServiceImpl(produtoRepository, new ModelMapper()), mock(CaixaRepository.class))).cancelar(1L));
         verify(vendaRepository).findById(Mockito.<Long>any());
     }
-
-    /**
-     * Method under test: {@link VendaServiceImpl#cancelarVenda(Long)}
-     */
-    @Test
-    void testCancelarVenda2() {
-        Venda venda = new Venda();
-        venda.setAtivo(true);
-        venda.setDataDaVenda(LocalDate.of(1970, 1, 1));
-        venda.setFormaPagamento(FormaPagamentoEnum.DEBITO);
-        venda.setId(1L);
-        venda.setProdutos(new HashSet<>());
-        Optional<Venda> ofResult = Optional.of(venda);
-        when(vendaRepository.save(Mockito.<Venda>any())).thenThrow(new VendaNotFoundException("An error occurred"));
-        when(vendaRepository.findById(Mockito.<Long>any())).thenReturn(ofResult);
-        assertThrows(VendaNotFoundException.class, () -> vendaServiceImpl.cancelarVenda(1L));
-        verify(vendaRepository).save(Mockito.<Venda>any());
-        verify(vendaRepository).findById(Mockito.<Long>any());
-    }
-
 }
 

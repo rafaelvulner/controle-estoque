@@ -6,18 +6,15 @@ import com.estoque.domain.dtos.ProdutoDTO;
 import java.util.List;
 import java.util.UUID;
 public interface ProdutoService {
-    ProdutoDTO cadastrarProduto(ProdutoDTO produtoDTO);
 
-    ProdutoDTO buscarProduto(UUID id);
+    Produto buscarPorUUID(UUID id);
 
-    List<ProdutoDTO> buscarTodosProdutos();
+    List<ProdutoDTO> buscarTodos(int page, int size, String sort, String order);
 
-    void excluirProduto(Long id);
-
-    Produto verificarProdutoPorId(Long id);
-
-    Produto verificarProdutoPorSku(UUID sku);
+    void excluir(Long id);
 
 
-    List<ProdutoDTO> cadastrarProdutos(List<ProdutoDTO> produtoDTOS);
+    List<ProdutoDTO> cadastrar(List<ProdutoDTO> produtos);
+
+    Produto buscarPorId(Long id);
 }

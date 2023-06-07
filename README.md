@@ -109,7 +109,7 @@ Rodar a aplicação
 
 - Dentro do Postman, clicar em import
 - Upload Files
-- Selecionar a collection que consta na raiz do projeto com o nome `Controle estoque Inmetrics.postman_collection.json`
+- Selecionar a Collection [Fazer download](https://raw.githubusercontent.com/rafaelvulner/controle-estoque/master/Controle%20estoque%20Inmetrics.postman_collection.json)
 - Import
 
 Pronto, já vai estar tudo organizado para realizar os testes locais.

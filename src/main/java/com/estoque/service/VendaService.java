@@ -9,13 +9,15 @@ import java.util.List;
 public interface VendaService {
 
 
-    VendaDTO vendaDeProdutos(VendaDTO vendaDTO);
+    VendaDTO cadastrar(VendaDTO vendaDTO);
 
-    VendaDTO buscarVenda(Long id);
+    VendaDTO buscar(Long id);
 
-    CancelamentoVendaDTO cancelarVenda(Long id);
+    CancelamentoVendaDTO cancelar(Long id);
 
-    List<VendaDTO> buscarTodasVendasPorData(LocalDate data);
+    List<VendaDTO> buscarTodos(LocalDate localDate);
+
+
 
 
 

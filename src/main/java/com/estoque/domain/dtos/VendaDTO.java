@@ -3,6 +3,7 @@ package com.estoque.domain.dtos;
 import com.estoque.domain.FormaPagamentoEnum;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -17,4 +18,6 @@ public class VendaDTO {
     private FormaPagamentoEnum formaPagamento;
 
     private boolean ativo;
+
+    private LocalDate dataDaVenda;
 }
